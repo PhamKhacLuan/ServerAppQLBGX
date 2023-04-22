@@ -7,11 +7,9 @@ const ThongTinTheDocModel = new Schema({
     maTheDoc: { type: String, maxLength: 255 },
     bienSo: { type: String, maxLength: 255 },
     anhXeVaoURL: { type: String, maxLength: 255 },
-    thoiGianXeVaoBai: { type: Date },
+    thoiGianXeVaoBai: { type: Date, default: Date.now },
     createAt: { type: Date, default: Date.now },
     updateAt: { type: Date, default: Date.now },
-}, {
-    _id: false
 })
 
 mongoose.plugin(slug);

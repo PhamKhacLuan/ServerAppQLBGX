@@ -5,9 +5,10 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
 
 const UserModel = new Schema({
-    _id: { type: Number },
+    idNhanVien: { type: Number },
     username: { type: String, maxLength: 255 },
     password: { type: String, maxLength: 255 },
+    name: { type: String, maxLength: 255 },
     idVaiTro: { type: Number },
     anhUrl: { type: String, maxLength: 255 },
     createAt: { type: Date, default: Date.now },

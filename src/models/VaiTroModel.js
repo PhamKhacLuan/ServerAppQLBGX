@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import slug from "mongoose-slug-generator";
+const mongoose = require("mongoose");
+const slug = require("mongoose-slug-generator");
 
 const Schema = mongoose.Schema;
 
@@ -12,4 +12,4 @@ const VaiTroModel = new Schema({
 
 mongoose.plugin(slug);
 
-module.exports = mongoose.model('VaiTro', VaiTroModel);
+module.exports = mongoose.model('VaiTroModel', VaiTroModel);

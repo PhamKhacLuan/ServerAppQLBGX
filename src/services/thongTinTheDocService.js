@@ -20,18 +20,13 @@ let createNewRFIDTag = (RFIDTagData) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (RFIDTagData.maTheDoc) {
-                let dataImg = await fs.readFileSync(RFIDTagData.anhXeVaoData, function (err) {
-                    if (err) {
-                        resolve({
-                            errCode: 3,
-                            errMessage: `Có lỗi trong quá trình đọc dữ liệu ảnh`
-                        })
-                    }
-                });
+                let dataImg = RFIDTagData.anhXeVaoData;
+                let binaryData = Buffer.from(dataImg, 'base64');
                 var linkImg = RFIDTagData.anhXeVaoURL;
-                var nameImg = linkImg.split('\\')[linkImg.split('\\').length - 1];
-                await fs.writeFileSync('src\\public\\img\\XeVao' + nameImg, dataImg);
-                RFIDTagData.anhXeVaoURL = 'src\\public\\img\\XeVao' + nameImg;
+                var nameImg = linkImg + `.jpg`;
+                console.log(nameImg);
+                fs.writeFileSync('src\\public\\img\\XeVao\\' + nameImg, binaryData);
+                RFIDTagData.anhXeVaoURL = nameImg;
                 check = await checkMaTheDoc(RFIDTagData.maTheDoc);
                 if (check) {
                     resolve({
@@ -39,11 +34,12 @@ let createNewRFIDTag = (RFIDTagData) => {
                         errMessage: `Mã thẻ đã được sử dụng. Vui lòng dùng thẻ đọc khác!!!`
                     })
                 } else {
+                    RFIDTagData.thoiGianXeVaoBai = Date.now();
                     const newRFIDTag = new ThongTinTheDocModel(RFIDTagData);
                     await newRFIDTag.save();
                     resolve({
                         errCode: 0,
-                        errMessage: `Lưu thông tin thẻ đọc thành công`
+                        message: `Lưu thông tin thẻ đọc thành công`
                     })
                 }
             } else {
@@ -82,8 +78,28 @@ let deleteRFIDTag = (maTheDocData) => {
         }
     })
 }
+
+let checkRFIDTagExist = (maTheDoc) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let check = await checkMaTheDoc(maTheDoc);
+            if (check === true) {
+                resolve({
+                    message: "True"
+                })
+            } else {
+                resolve({
+                    message: "False"
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports = {
-    createNewRFIDTagL: createNewRFIDTag,
+    createNewRFIDTag: createNewRFIDTag,
     getAllRFIDTags: getAllRFIDTags,
-    deleteRFIDTag: deleteRFIDTag
+    deleteRFIDTag: deleteRFIDTag,
+    checkRFIDTagExist: checkRFIDTagExist
 }

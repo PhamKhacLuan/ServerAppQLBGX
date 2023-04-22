@@ -1,4 +1,5 @@
 const UserModel = require('../models/UserModel');
+const VaiTroModel = require('../models/VaiTroModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const fs = require('fs');
@@ -34,26 +35,20 @@ let CreateNewUser = (userData) => {
     return new Promise(async (resolve, reject) => {
         try {
             let check = await checkUsername(userData.username);
-            if (userData.anhData) {
-                let dataImg = await fs.readFileSync(userData.anhData, function (err) {
-                    if (err) {
-                        resolve({
-                            errCode: 3,
-                            errMessage: `Có lỗi trong quá trình đọc dữ liệu ảnh`
-                        })
-                    }
-                });
-                var linkImg = userData.anhUrl;
-                var nameImg = linkImg.split('\\')[linkImg.split('\\').length - 1];
-                await fs.writeFileSync('src\\public\\img\\' + nameImg, dataImg);
-                userData.anhUrl = 'src\\public\\img\\user' + nameImg;
-            }
             if (check) {
                 resolve({
                     errCode: 1,
                     errMessage: `Username đã được sử dụng. Vui lòng dùng username khác!!!`
                 })
             } else {
+                if (userData.anhData) {
+                    let dataImg = userData.anhData;
+                    let binaryData = Buffer.from(dataImg, 'base64');
+                    var linkImg = userData.anhUrl;
+                    var nameImg = linkImg.split('\\')[linkImg.split('\\').length - 1];
+                    await fs.writeFileSync('src\\public\\img\\user\\' + nameImg, binaryData);
+                    userData.anhUrl = 'src\\public\\img\\user\\' + nameImg;
+                }
                 userData.password = await hashUserPassword(userData.password);
                 const newUser = new UserModel(userData);
                 await newUser.save();
@@ -85,29 +80,44 @@ let handleUserLogin = (username, password) => {
             let userData = {};
             let isExist = await checkUsername(username);
             if (isExist) {
-                let user = await db.User.findOne({
-                    where: { email: email },
-                    attributes: ['email', 'roleId', 'password'],
-                    raw: true
-                })
+                let user = await UserModel.findOne({ username: username });
                 if (user) {
                     let check = await bcrypt.compareSync(password, user.password);
                     if (check) {
-                        userData.errCode = 0;
-                        userData.errMessage = 'ok';
-                        delete user.password;
-                        userData.user = user;
+                        let role = await VaiTroModel.findOne({ idVaiTro: user.idVaiTro });
+                        userData.message = {
+                            errCode: 0,
+                            message: "Đăng nhập thành công"
+                        }
+                        let userTemp = {
+                            _id: user._id,
+                            idNhanVien: user.idNhanVien,
+                            username: user.username,
+                            name: user.name,
+                            vaiTro: {
+                                idVaiTro: role.idVaiTro,
+                                vaiTro: role.VaiTro
+                            },
+                            anhUrl: user.anhUrl
+                        };
+                        userData.user = userTemp;
                     } else {
-                        userData.errCode = 3;
-                        userData.errMessage = 'Sai mật khẩu';
+                        userData.message = {
+                            errCode: 3,
+                            errMessage: 'Sai mật khẩu'
+                        };
                     }
                 } else {
-                    userData.errCode = 2;
-                    userData.errMessage = `Không tìm thấy user`;
+                    userData.message = {
+                        errCode: 2,
+                        errMessage: 'Không tìm thấy user'
+                    };
                 }
             } else {
-                userData.errCode = 1;
-                userData.errMessage = "Username không đúng. Vui lòng thử nhập lại đúng username";
+                userData.message = {
+                    errCode: 1,
+                    errMessage: 'Username không đúng. Vui lòng thử nhập lại đúng username'
+                };
             }
             resolve(userData);
         } catch (e) {

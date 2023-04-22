@@ -1,4 +1,6 @@
+const fs = require('fs');
 const LichSuModel = require('../models/LichSuModel');
+const ThongTinTheDocModel = require('../models/ThongTinTheDocModel');
 
 let checkKhoaChinh = (bienSo, thoiGianXeVaoBai) => {
     return new Promise(async (resolve, reject) => {
@@ -15,25 +17,6 @@ let checkKhoaChinh = (bienSo, thoiGianXeVaoBai) => {
     })
 }
 
-let saveImg = (data, anhUrl, url) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let dataImg = await fs.readFileSync(data, function (err) {
-                if (err) {
-                    resolve(false)
-                }
-            });
-            var linkImg = anhUrl;
-            var nameImg = linkImg.split('\\')[linkImg.split('\\').length - 1];
-            await fs.writeFileSync(url + nameImg, dataImg);
-            anhUrl = url + nameImg;
-            resolve(anhUrl);
-        } catch (e) {
-            reject(e);
-        }
-    })
-}
-
 let createNewHistory = (historyData) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -44,9 +27,31 @@ let createNewHistory = (historyData) => {
                     errMessage: `Biển số và thời gian xe vào trên cùng một bảng ghi đã tồn tại!!!`
                 })
             } else {
-                historyData.anhXeRaURL = saveImg(historyData.anhXeRaData, historyData.anhXeRaURL, 'src\\public\\img\\XeRa');
-                const newHistory = new LichSuModel(RFIDTagData);
+                let dataImg = historyData.anhXeRaData;
+                let binaryData = Buffer.from(dataImg, 'base64');
+                var linkImg = historyData.anhXeRaURL;
+                var nameImg = linkImg + ".jpg";
+                historyData.anhXeRaURL = nameImg;
+                let dataTTTD = await ThongTinTheDocModel.findOne({ maTheDoc: historyData.maTheDoc });
+                if (!dataTTTD) {
+                    resolve({
+                        errCode: 1,
+                        errMessage: `Thẻ đọc này chưa được sử dụng`
+                    })
+                }
+                historyData.thoiGianXeVaoBai = dataTTTD.thoiGianXeVaoBai;
+                historyData.anhXeVaoURL = dataTTTD.anhXeVaoURL;
+                historyData.thoiGianXeRaBai = Date.now();
+                if (historyData.bienSo !== dataTTTD.bienSo) {
+                    resolve({
+                        errCode: 1,
+                        errMessage: `Sai biển số`
+                    })
+                }
+                await fs.writeFileSync('src\\public\\img\\XeRa\\' + nameImg, binaryData);
+                const newHistory = new LichSuModel(historyData);
                 await newHistory.save();
+                await ThongTinTheDocModel.deleteOne({ maTheDoc: dataTTTD.maTheDoc })
                 resolve({
                     errCode: 0,
                     errMessage: `Lưu lịch sử thành công`
@@ -68,8 +73,73 @@ let getAllHistories = () => {
         }
     })
 }
-
+let getImgIn = (img_name) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let imgName = "src/public/img/XeVao/" + img_name;
+            fs.readFile(imgName, (err, data) => {
+                if (err) {
+                    resolve({
+                        errMessage: 'load ảnh không thành công',
+                        errCode: 1,
+                    })
+                }
+                else {
+                    resolve({
+                        data: data,
+                        contentType: 'image/jpeg'
+                    })
+                }
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+let getImgOut = (img_name) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let imgName = "src/public/img/XeRa/" + img_name;
+            fs.readFile(imgName, (err, data) => {
+                if (err) {
+                    resolve({
+                        errMessage: 'load ảnh không thành công',
+                        errCode: 1,
+                    })
+                }
+                else {
+                    resolve({
+                        data: data,
+                        contentType: 'image/jpeg'
+                    })
+                }
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+let getHistory = (idLichSu) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let history = await LichSuModel.findOne({ idLichSu: idLichSu });
+            if (history) {
+                resolve(history);
+            } else {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Không tìm thấy lịch sử đã lưu'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
 module.exports = {
     createNewHistory: createNewHistory,
-    getAllHistories: getAllHistories
+    getAllHistories: getAllHistories,
+    getImgIn: getImgIn,
+    getImgOut: getImgOut,
+    getHistory: getHistory
 }
