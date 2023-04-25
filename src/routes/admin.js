@@ -10,5 +10,7 @@ router.delete('/api/delete-user', userController.handleDeleteUser);
 router.put('/api/update-user', userController.handleUpdateUser);
 
 router.get('/api/get-all-manual-activation', KichHoatThuCongController.handleGetAllManualActivation);
+router.get('/api/get-manual-activation', KichHoatThuCongController.handleGetManualActivation);
+router.get('/api/get-img', KichHoatThuCongController.handleGetImg)
 
 module.exports = router;

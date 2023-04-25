@@ -5,6 +5,7 @@ const thongTinTheDocController = require('../controllers/thongTinTheDocControlle
 const lichSuController = require('../controllers/lichSuController');
 const userController = require('../controllers/userController');
 const vaiTroController = require('../controllers/vaiTroController');
+const kichHoatThuCongController = require('../controllers/kichHoatThuCongController');
 
 router.post('/api/create-new-rfid-tag', thongTinTheDocController.handleCreateNewRFIDTag);
 router.get('/api/get-all-rfid-tags', thongTinTheDocController.handleGetAllRFIDTags);
@@ -21,5 +22,7 @@ router.post('/api/login', userController.handleLogin);
 
 router.post('/api/create-role', vaiTroController.handleCreateRole);
 router.get('/api/get-role', vaiTroController.handleGetRole);
+
+router.post('/api/create-new-manual-activation', kichHoatThuCongController.handleCreateNewManualActivation)
 
 module.exports = router;

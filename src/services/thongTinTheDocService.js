@@ -24,7 +24,6 @@ let createNewRFIDTag = (RFIDTagData) => {
                 let binaryData = Buffer.from(dataImg, 'base64');
                 var linkImg = RFIDTagData.anhXeVaoURL;
                 var nameImg = linkImg + `.jpg`;
-                console.log(nameImg);
                 fs.writeFileSync('src\\public\\img\\XeVao\\' + nameImg, binaryData);
                 RFIDTagData.anhXeVaoURL = nameImg;
                 check = await checkMaTheDoc(RFIDTagData.maTheDoc);
