@@ -96,9 +96,27 @@ let checkRFIDTagExist = (maTheDoc) => {
         }
     })
 }
+let getRFIDTag = (maTheDoc) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let infoRFIDTag = await ThongTinTheDocModel.findOne({ maTheDoc: maTheDoc });
+            if (infoRFIDTag) {
+                resolve(infoRFIDTag);
+            } else {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Không tìm thấy thông tin thẻ đọc'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
 module.exports = {
     createNewRFIDTag: createNewRFIDTag,
     getAllRFIDTags: getAllRFIDTags,
     deleteRFIDTag: deleteRFIDTag,
-    checkRFIDTagExist: checkRFIDTagExist
+    checkRFIDTagExist: checkRFIDTagExist,
+    getRFIDTag: getRFIDTag
 }

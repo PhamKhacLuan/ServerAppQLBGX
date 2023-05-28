@@ -48,10 +48,12 @@ let createNewHistory = (historyData) => {
                         errMessage: `Sai biển số`
                     })
                 }
-                await fs.writeFileSync('src\\public\\img\\XeRa\\' + nameImg, binaryData);
-                const newHistory = new LichSuModel(historyData);
-                await newHistory.save();
-                await ThongTinTheDocModel.deleteOne({ maTheDoc: dataTTTD.maTheDoc })
+                else {
+                    await fs.writeFileSync('src\\public\\img\\XeRa\\' + nameImg, binaryData);
+                    const newHistory = new LichSuModel(historyData);
+                    await newHistory.save();
+                    await ThongTinTheDocModel.deleteOne({ maTheDoc: dataTTTD.maTheDoc })
+                }
                 resolve({
                     errCode: 0,
                     errMessage: `Lưu lịch sử thành công`
