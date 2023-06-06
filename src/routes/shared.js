@@ -11,7 +11,7 @@ router.post('/api/create-new-rfid-tag', thongTinTheDocController.handleCreateNew
 router.get('/api/get-all-rfid-tags', thongTinTheDocController.handleGetAllRFIDTags);
 router.delete('/api/delete-rfid-tag', thongTinTheDocController.handleDeleteRFIDTag);
 router.get('/api/check-rfid-tag-exist', thongTinTheDocController.handleCheckRFIDTagExist);
-router.get('api/get-rfid-tag', thongTinTheDocController.handleGetRFIDTag);
+router.get('/api/get-rfid-tag', thongTinTheDocController.handleGetRFIDTag);
 
 router.post('/api/create-new-history', lichSuController.handleCreateNewHistory);
 router.get('/api/get-all-histories', lichSuController.handleGetAllHistories);

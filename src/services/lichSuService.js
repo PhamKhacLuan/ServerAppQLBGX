@@ -56,7 +56,7 @@ let createNewHistory = (historyData) => {
                 }
                 resolve({
                     errCode: 0,
-                    errMessage: `Lưu lịch sử thành công`
+                    message: `Lưu lịch sử thành công`
                 })
             }
         } catch (e) {

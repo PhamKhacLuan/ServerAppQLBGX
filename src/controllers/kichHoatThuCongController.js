@@ -1,14 +1,14 @@
 const KichHoatThuCongService = require('../services/kichHoatThuCongService');
 let handleGetAllManualActivation = async (req, res) => {
-    let message = KichHoatThuCongService.getAllManualActivation();
+    let message = await KichHoatThuCongService.getAllManualActivation();
     return res.status(200).json(message);
 }
 let handleCreateNewManualActivation = async (req, res) => {
-    let message = KichHoatThuCongService.createNewManualActivation(req.body);
+    let message = await KichHoatThuCongService.createNewManualActivation(req.body);
     return res.status(200).json(message);
 }
 let handleGetManualActivation = async (req, res) => {
-    let message = KichHoatThuCongService.getManualActivation(req.query.idKHCTC);
+    let message = await KichHoatThuCongService.getManualActivation(req.query.idKHCTC);
     return res.status(200).json(message);
 }
 let handleGetImg = async (req, res) => {

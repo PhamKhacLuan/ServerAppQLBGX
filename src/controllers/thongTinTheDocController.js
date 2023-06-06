@@ -22,7 +22,8 @@ let handleCheckRFIDTagExist = async (req, res) => {
 }
 
 let handleGetRFIDTag = async (req, res) => {
-    let message = await thongTinTheDocService.getRFIDTag(req.query.idLichSu);
+    console.log(req.query.maTheDoc)
+    let message = await thongTinTheDocService.getRFIDTag(req.query.maTheDoc);
     return res.status(200).json(message);
 }
 

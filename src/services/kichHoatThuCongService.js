@@ -1,6 +1,7 @@
 const KichHoatThuCongModel = require('../models/KichHoatThuCongModel');
 const ThongTinTheDocModel = require('../models/ThongTinTheDocModel');
 const UserModel = require('../models/UserModel');
+const fs = require('fs');
 
 let getAllManualActivation = () => {
     return new Promise(async (resolve, reject) => {
@@ -15,26 +16,18 @@ let getAllManualActivation = () => {
 let createNewManualActivation = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (data.check == "ra") {
-                let check = await ThongTinTheDocModel.findOne({ bienSo: data.bienSo })
-                if (!check) {
-                    resolve({
-                        errCode: 1,
-                        errMessage: `Không tồn tại biển số trong thông tin thẻ đọc`
-                    })
-                }
-            }
             let dataImg = data.anhData;
             let binaryData = Buffer.from(dataImg, 'base64');
-            var linkImg = data.anhURL;
+            var linkImg = data.anhUrl;
             var nameImg = linkImg + ".jpg";
             if (data.check == "ra") {
-                data.anhURL = "/XeRa/" + nameImg;
+                data.anhUrl = "/XeRa/" + nameImg;
             } else {
-                data.anhURL = "/XeVao/" + nameImg;
+                data.anhUrl = "/XeVao/" + nameImg;
             }
+            console.log(data.anhUrl)
             data.thoiGianMoCong = Date.now();
-            await fs.writeFileSync('src/public/img' + data.anhURL, binaryData);
+            await fs.writeFileSync('src/public/img' + data.anhUrl, binaryData);
             const newKHCTC = KichHoatThuCongModel(data);
             await newKHCTC.save();
             resolve({
