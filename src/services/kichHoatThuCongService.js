@@ -42,10 +42,16 @@ let createNewManualActivation = (data) => {
 let getManualActivation = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
+            console.log(id);
             let MAs = await KichHoatThuCongModel.findOne({ idKHCTC: id });
-            let user = await UserModel.findOne({ idNhanVien: Mas.idNhanVien })
-            MAs.name = user.name;
-            resolve(MAs);
+            let user = await UserModel.findOne({ idNhanVien: MAs.idNhanVien })
+            result = {
+                name: user.name,
+                thoiGianMoCong: MAs.thoiGianMoCong,
+                anhUrl: MAs.anhUrl
+            }
+            console.log(result)
+            resolve(result);
         } catch (e) {
             reject(e);
         }
